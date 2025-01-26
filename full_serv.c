@@ -22,22 +22,22 @@ void sendMsg(int sender_fd) {
 
 int main(int ac, char **av) {
     if (ac != 2) exitError("Wrong number of arguments\n");
-  	int sockfd = max = socket(AF_INET, SOCK_STREAM, 0); // copy from subject/main.c Unitl line 27
-	if (sockfd == -1) exitError("Fatal error\n"); // copy from subject/main.c
+  	int sockfd = max = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockfd == -1) exitError("Fatal error\n");
     FD_ZERO(&active_fds);
     FD_SET(sockfd, &active_fds);
-	struct sockaddr_in servaddr; // copy from subject/main.c from subject/main.c Unitl line 35
-	servaddr.sin_family = AF_INET; // copy from subject/main.c
-	servaddr.sin_addr.s_addr = htonl(2130706433); //127.0.0.1 // copy from subject/main.c
-	servaddr.sin_port = htons(atoi(av[1])); // copy from subject/main.c change the PORT
-	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) exitError("Fatal error\n"); // copy from subject/main.c
-	if (listen(sockfd, 10) != 0) exitError("Fatal error\n"); // copy from subject/main.c
+	struct sockaddr_in servaddr;
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(2130706433);
+	servaddr.sin_port = htons(atoi(av[1]));
+	if ((bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr))) != 0) exitError("Fatal error\n");
+	if (listen(sockfd, 10) != 0) exitError("Fatal error\n");
     
     while(1) {
         Read_fds = Write_fds = active_fds;
         if (select(max + 1, &Read_fds, &Write_fds, NULL, NULL) < 0) continue;
         for (int fd = 0; fd <= max; fd++) {
-            if (FD_ISSET(fd, &Read_fds) && fd == sockfd) { // hnaya sorry in english here join new client
+            if (FD_ISSET(fd, &Read_fds) && fd == sockfd) {
               
               
                 int ClientSocket = accept(sockfd, NULL, NULL);
@@ -46,7 +46,7 @@ int main(int ac, char **av) {
 
 
                 clients[ClientSocket].id = next_id++;
-                bzero(clients[ClientSocket].msg, strlen(clients[ClientSocket].msg)); // protection
+                bzero(clients[ClientSocket].msg, strlen(clients[ClientSocket].msg));
                 FD_SET(ClientSocket, &active_fds);
                 sprintf(buffWrite, "server: client %d just arrived\n", clients[ClientSocket].id);
                 sendMsg(ClientSocket);
@@ -56,7 +56,7 @@ int main(int ac, char **av) {
 
 
             
-            if (FD_ISSET(fd, &Read_fds) && fd != sockfd) { // recive mf its empty than the client is quit
+            if (FD_ISSET(fd, &Read_fds) && fd != sockfd) {
                 int read = recv(fd, buffRead, sizeof(buffRead), 0);
                 if (read <= 0) { // handle quit
                     sprintf(buffWrite, "server: client %d just left\n", clients[fd].id);
